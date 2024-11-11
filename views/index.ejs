@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PetCare</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>PetCare</h1>
+        
+        <% if (error) { %>
+            <div class="error-message">
+                <%= error %>
+            </div>
+        <% } %>
+
+        <div class="main-actions">
+            <a href="/nuevo-horario" class="btn-action">
+                <span>➕</span>
+                Agregar Nuevo Horario
+            </a>
+        </div>
+
+        <div class="card">
+            <h2>Horarios Programados</h2>
+            <% if (horarios && horarios.length > 0) { %>
+                <div class="horarios-grid">
+                    <% horarios.forEach(horario => { %>
+                        <div class="horario-card">
+                            <div class="horario-info">
+                                <div class="horario-tiempo">
+                                    <span>🕒</span>
+                                    <%= horario.hora.toString().padStart(2, '0') %>:<%= horario.minutos.toString().padStart(2, '0') %>
+                                </div>
+                                <div class="horario-cantidad">
+                                    <span>🥣</span>
+                                    <%= horario.cantidad %>g
+                                </div>
+                                <form action="/eliminar-horario/<%= horario._id %>" method="POST">
+                                    <button type="submit" class="btn-delete">
+                                        Eliminar
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    <% }); %>
+                </div>
+            <% } else { %>
+                <div class="no-horarios">
+                    <p>No hay horarios programados</p>
+                </div>
+            <% } %>
+        </div>
+    </div>
+</body>
+</html> 
