@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estado del Plato - PetCare</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Estado del Plato</h1>
+        
+        <div class="plato-card">
+            <h2>Cantidad Actual de Comida</h2>
+            <div class="cantidad-actual" id="cantidadComida">
+                Cargando...
+            </div>
+            <div class="ultima-actualizacion" id="ultimaActualizacion">
+                Última actualización: --:--
+            </div>
+        </div>
+
+        <div class="actions">
+            <a href="/" class="btn-back">Volver al Inicio</a>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        
+        socket.on('actualizacionPlato', (datos) => {
+            document.getElementById('cantidadComida').textContent = `${datos.cantidad}g`;
+            document.getElementById('ultimaActualizacion').textContent = 
+                `Última actualización: ${new Date().toLocaleTimeString()}`;
+        });
+    </script>
+</body>
+</html> 

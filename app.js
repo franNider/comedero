@@ -85,6 +85,28 @@ app.post('/eliminar-horario/:id', async (req, res) => {
     }
 });
 
+app.get('/api/datos', async (req, res) => {
+  try {
+    const horarios = await Horario.find().sort({ hora: 1, minutos: 1 });
+    
+    if (horarios.length > 0) {
+      const datosFormateados = horarios.map(horario => ({
+        hora: horario.hora,
+        minuto: horario.minutos,
+        gramos: horario.cantidad
+      }));
+      res.json(datosFormateados);
+    } else {
+      res.json({
+        mensaje: "No hay horarios programados"
+      });
+    }
+  } catch (error) {
+    console.error('Error al obtener horarios:', error);
+    res.status(500).json({ error: 'Error al obtener datos' });
+  }
+});
+
 app.listen(port, '0.0.0.0', () => {
     console.log(`🚀 Servidor corriendo en puerto ${port}`);
 });
