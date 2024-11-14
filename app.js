@@ -109,6 +109,22 @@ app.get('/api/datos', async (req, res) => {
   }
 });
 
+app.get('/estado-plato', (req, res) => {
+    try {
+        res.render('estado-plato', {
+            error: null,
+            cantidad: null,
+            ultimaActualizacion: null
+        });
+    } catch (error) {
+        console.error('Error al cargar estado del plato:', error);
+        res.status(500).render('error', {
+            mensaje: 'Error al cargar la página',
+            error: 'Por favor, intenta nuevamente más tarde'
+        });
+    }
+});
+
 http.listen(PORT, () => {
     console.log(`Servidor corriendo en puerto ${PORT}`);
 });
