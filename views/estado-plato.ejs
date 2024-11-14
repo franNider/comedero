@@ -12,11 +12,21 @@
         
         <div class="plato-card">
             <h2>Cantidad Actual de Comida</h2>
-            <div class="cantidad-actual" id="cantidadComida">
-                Cargando...
+            <div id="contenidoPlato">
+                <div class="cantidad-actual" id="cantidadComida">
+                    Cargando...
+                </div>
+                <div class="ultima-actualizacion" id="ultimaActualizacion">
+                    Última actualización: --:--
+                </div>
             </div>
-            <div class="ultima-actualizacion" id="ultimaActualizacion">
-                Última actualización: --:--
+            
+            <div id="errorMensaje" class="error-message" style="display: none;">
+                <div class="icon">⚠️</div>
+                <div class="message">No se están recibiendo datos del dispensador</div>
+                <div class="suggestion">
+                    Por favor, verifica que el dispositivo esté conectado y funcionando correctamente
+                </div>
             </div>
         </div>
 
@@ -28,12 +38,44 @@
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
+        let ultimaActualizacion = new Date();
+        let timeoutId;
+
+        function mostrarError() {
+            document.getElementById('contenidoPlato').style.display = 'none';
+            document.getElementById('errorMensaje').style.display = 'block';
+        }
+
+        function ocultarError() {
+            document.getElementById('contenidoPlato').style.display = 'block';
+            document.getElementById('errorMensaje').style.display = 'none';
+        }
+
+        function verificarConexion() {
+            const ahora = new Date();
+            const diferencia = ahora - ultimaActualizacion;
+            
+            // Si han pasado más de 10 segundos sin actualización, mostrar error
+            if (diferencia > 10000) {
+                mostrarError();
+            }
+        }
         
         socket.on('actualizacionPlato', (datos) => {
+            ocultarError();
+            ultimaActualizacion = new Date();
+            
             document.getElementById('cantidadComida').textContent = `${datos.cantidad}g`;
             document.getElementById('ultimaActualizacion').textContent = 
-                `Última actualización: ${new Date().toLocaleTimeString()}`;
+                `Última actualización: ${ultimaActualizacion.toLocaleTimeString()}`;
+            
+            // Reiniciar el temporizador
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(verificarConexion, 10000);
         });
+
+        // Verificar conexión inicial después de 10 segundos
+        timeoutId = setTimeout(verificarConexion, 10000);
     </script>
 </body>
 </html> 

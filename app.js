@@ -2,9 +2,11 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const app = express();
+const http = require('http').createServer(app);
+const io = require('socket.io')(http);
 
-// Usar puerto de la plataforma o 3000 por defecto
-const port = process.env.PORT || 3000;
+// Usar la variable de entorno PORT
+const PORT = process.env.PORT || 3000;
 
 // URL de conexión de MongoDB Atlas con tu usuario y contraseña
 const MONGODB_URI = "mongodb+srv://fran:tribyte@cluster0.g2lev.mongodb.net/dispensador?retryWrites=true&w=majority&appName=Cluster0";
@@ -107,6 +109,6 @@ app.get('/api/datos', async (req, res) => {
   }
 });
 
-app.listen(port, '0.0.0.0', () => {
-    console.log(`🚀 Servidor corriendo en puerto ${port}`);
+http.listen(PORT, () => {
+    console.log(`Servidor corriendo en puerto ${PORT}`);
 });

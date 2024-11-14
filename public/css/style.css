@@ -196,12 +196,31 @@ select:focus, input:focus {
 }
 
 .error-message {
-    background-color: #ffebee;
-    color: #c62828;
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #ef9a9a;
-    border-radius: 4px;
+    background-color: #fff3f3;
+    border: 1px solid #ffcdd2;
+    border-radius: 8px;
+    padding: 20px;
+    margin: 20px auto;
+    max-width: 400px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.error-message .icon {
+    font-size: 2em;
+    color: #e74c3c;
+    margin-bottom: 10px;
+}
+
+.error-message .message {
+    color: #c0392b;
+    font-size: 1.1em;
+    margin-bottom: 10px;
+}
+
+.error-message .suggestion {
+    color: #7f8c8d;
+    font-size: 0.9em;
 }
 
 .horarios-list {
@@ -209,28 +228,35 @@ select:focus, input:focus {
 }
 
 .main-actions {
-    margin-bottom: 30px;
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 300px;
+    margin: 30px auto;
 }
 
 .btn-action {
-    display: inline-flex;
+    display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 15px 30px;
-    background-color: #1a237e;
+    justify-content: center;
+    padding: 15px 25px;
+    background-color: #3498db;
     color: white;
     text-decoration: none;
-    border-radius: 8px;
-    font-size: 16px;
+    border-radius: 10px;
     transition: all 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 .btn-action:hover {
-    background-color: #283593;
+    background-color: #2980b9;
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.btn-action span {
+    margin-right: 10px;
+    font-size: 1.2em;
 }
 
 .header-with-back {
