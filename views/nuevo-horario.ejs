@@ -29,17 +29,39 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="cantidad">Cantidad de alimento</label>
-                    <div class="cantidad-container">
-                        <span>🥣</span>
-                        <input type="number" 
-                               id="cantidad" 
-                               name="cantidad" 
-                               min="1"
-                               max="500" 
-                               placeholder="Ingrese la cantidad (máx. 500)"
-                               required>
-                        <span class="unidad">gramos</span>
+                    <label for="cantidad">Cantidad de Comida:</label>
+                    <div class="cantidad-options">
+                        <label class="cantidad-option">
+                            <input type="radio" name="cantidad" value="50" required>
+                            <span class="option-text">
+                                <strong>Pequeña</strong>
+                                <small>50g</small>
+                            </span>
+                        </label>
+                        
+                        <label class="cantidad-option">
+                            <input type="radio" name="cantidad" value="150">
+                            <span class="option-text">
+                                <strong>Mediana</strong>
+                                <small>150g</small>
+                            </span>
+                        </label>
+                        
+                        <label class="cantidad-option">
+                            <input type="radio" name="cantidad" value="300">
+                            <span class="option-text">
+                                <strong>Grande</strong>
+                                <small>300g</small>
+                            </span>
+                        </label>
+                        
+                        <label class="cantidad-option">
+                            <input type="radio" name="cantidad" value="500">
+                            <span class="option-text">
+                                <strong>Muy Grande</strong>
+                                <small>500g</small>
+                            </span>
+                        </label>
                     </div>
                 </div>
                 

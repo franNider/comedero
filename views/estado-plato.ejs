@@ -3,29 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estado del Plato - PetCare</title>
+    <title>Estado del Comedero - PetCare</title>
     <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
     <div class="container">
-        <h1>Estado del Plato</h1>
+        <h1>Estado del Comedero</h1>
         
-        <div class="plato-card">
-            <h2>Cantidad Actual de Comida</h2>
-            <div id="contenidoPlato">
-                <div class="cantidad-actual" id="cantidadComida">
-                    Cargando...
-                </div>
-                <div class="ultima-actualizacion" id="ultimaActualizacion">
-                    Última actualización: --:--
+        <div class="estado-container">
+            <!-- Estado del Plato -->
+            <div class="estado-card">
+                <h2>Plato de Comida</h2>
+                <div id="contenidoPlato">
+                    <div class="cantidad-actual" id="cantidadPlato">
+                        Cargando...
+                    </div>
+                    <div class="ultima-actualizacion" id="ultimaActualizacionPlato">
+                        Última actualización: --:--
+                    </div>
                 </div>
             </div>
-            
-            <div id="errorMensaje" class="error-message" style="display: none;">
-                <div class="icon">⚠️</div>
-                <div class="message">No se están recibiendo datos del dispensador</div>
-                <div class="suggestion">
-                    Por favor, verifica que el dispositivo esté conectado y funcionando correctamente
+
+            <!-- Estado del Dispensador -->
+            <div class="estado-card">
+                <h2>Dispensador</h2>
+                <div id="contenidoDispensador">
+                    <div class="cantidad-actual" id="cantidadDispensador">
+                        Cargando...
+                    </div>
+                    <div class="ultima-actualizacion" id="ultimaActualizacionDispensador">
+                        Última actualización: --:--
+                    </div>
                 </div>
             </div>
         </div>
@@ -38,44 +46,18 @@
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
-        let ultimaActualizacion = new Date();
-        let timeoutId;
-
-        function mostrarError() {
-            document.getElementById('contenidoPlato').style.display = 'none';
-            document.getElementById('errorMensaje').style.display = 'block';
-        }
-
-        function ocultarError() {
-            document.getElementById('contenidoPlato').style.display = 'block';
-            document.getElementById('errorMensaje').style.display = 'none';
-        }
-
-        function verificarConexion() {
-            const ahora = new Date();
-            const diferencia = ahora - ultimaActualizacion;
-            
-            // Si han pasado más de 10 segundos sin actualización, mostrar error
-            if (diferencia > 10000) {
-                mostrarError();
-            }
-        }
         
-        socket.on('actualizacionPlato', (datos) => {
-            ocultarError();
-            ultimaActualizacion = new Date();
+        socket.on('actualizacionEstado', (datos) => {
+            // Actualizar plato
+            document.getElementById('cantidadPlato').textContent = `${datos.cantidadPlato}g`;
+            document.getElementById('ultimaActualizacionPlato').textContent = 
+                `Última actualización: ${new Date().toLocaleTimeString()}`;
             
-            document.getElementById('cantidadComida').textContent = `${datos.cantidad}g`;
-            document.getElementById('ultimaActualizacion').textContent = 
-                `Última actualización: ${ultimaActualizacion.toLocaleTimeString()}`;
-            
-            // Reiniciar el temporizador
-            clearTimeout(timeoutId);
-            timeoutId = setTimeout(verificarConexion, 10000);
+            // Actualizar dispensador
+            document.getElementById('cantidadDispensador').textContent = `${datos.cantidadDispensador}g`;
+            document.getElementById('ultimaActualizacionDispensador').textContent = 
+                `Última actualización: ${new Date().toLocaleTimeString()}`;
         });
-
-        // Verificar conexión inicial después de 10 segundos
-        timeoutId = setTimeout(verificarConexion, 10000);
     </script>
 </body>
 </html> 
