@@ -125,6 +125,32 @@ app.get('/estado-plato', (req, res) => {
     }
 });
 
+// Endpoint para recibir datos del ESP32
+app.post('/api/actualizar-estado', express.json(), (req, res) => {
+    const { cantidadPlato, cantidadDispensador } = req.body;
+    
+    // Emitir los datos a todos los clientes conectados
+    io.emit('actualizacionEstado', {
+        cantidadPlato,
+        cantidadDispensador
+    });
+    
+    res.json({ success: true });
+});
+
+// Endpoint para obtener el último estado
+app.get('/api/estado', async (req, res) => {
+    try {
+        // Aquí podrías obtener los últimos valores de una base de datos
+        res.json({
+            cantidadPlato: ultimaCantidadPlato,
+            cantidadDispensador: ultimaCantidadDispensador
+        });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al obtener datos' });
+    }
+});
+
 http.listen(PORT, () => {
     console.log(`Servidor corriendo en puerto ${PORT}`);
 });

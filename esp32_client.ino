@@ -22,4 +22,16 @@ void enviarDatos(float cantidadPlato, float cantidadDispensador) {
             http.end();
         }
     }
+}
+
+void loop() {
+    if (WiFi.status() == WL_CONNECTED) {
+        // Leer valores de los sensores
+        float cantidadPlato = leerSensorPlato();        // Implementar según tu sensor
+        float cantidadDispensador = leerSensorDispensador();  // Implementar según tu sensor
+        
+        // Enviar datos al servidor
+        enviarDatos(cantidadPlato, cantidadDispensador);
+    }
+    delay(5000);
 } 
