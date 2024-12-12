@@ -5,72 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Estado del Comedero - PetCare</title>
     <link rel="stylesheet" href="/css/style.css">
-    <style>
-        .estado-container {
-            display: flex;
-            justify-content: space-around;
-            margin: 20px 0;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-
-        .estado-card {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            min-width: 250px;
-            text-align: center;
-        }
-
-        .cantidad-actual {
-            font-size: 2em;
-            margin: 15px 0;
-            color: #2c3e50;
-        }
-
-        .ultima-actualizacion {
-            color: #7f8c8d;
-            font-size: 0.9em;
-        }
-
-        .btn-back {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #3498db;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            margin-top: 20px;
-            transition: background-color 0.3s;
-        }
-
-        .btn-back:hover {
-            background-color: #2980b9;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-
-        h1 {
-            color: #2c3e50;
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        h2 {
-            color: #34495e;
-            margin-bottom: 15px;
-        }
-
-        .actions {
-            text-align: center;
-            margin-top: 30px;
-        }
-    </style>
 </head>
 <body>
     <div class="container">
@@ -82,10 +16,10 @@
                 <h2>Plato de Comida</h2>
                 <div id="contenidoPlato">
                     <div class="cantidad-actual" id="cantidadPlato">
-                        <%= typeof cantidadPlato !== 'undefined' ? cantidadPlato : 0 %>g
+                        Cargando...
                     </div>
                     <div class="ultima-actualizacion" id="ultimaActualizacionPlato">
-                        Última actualización: <%= ultimaActualizacion ? new Date(ultimaActualizacion).toLocaleTimeString() : '--:--' %>
+                        Última actualización: --:--
                     </div>
                 </div>
             </div>
@@ -95,10 +29,10 @@
                 <h2>Dispensador</h2>
                 <div id="contenidoDispensador">
                     <div class="cantidad-actual" id="cantidadDispensador">
-                        <%= typeof cantidadDispensador !== 'undefined' ? cantidadDispensador : 0 %>g
+                        Cargando...
                     </div>
                     <div class="ultima-actualizacion" id="ultimaActualizacionDispensador">
-                        Última actualización: <%= ultimaActualizacion ? new Date(ultimaActualizacion).toLocaleTimeString() : '--:--' %>
+                        Última actualización: --:--
                     </div>
                 </div>
             </div>
@@ -113,34 +47,16 @@
     <script>
         const socket = io();
         
-        // Función para formatear la hora
-        function formatTime(date) {
-            return new Date(date).toLocaleTimeString();
-        }
-        
         socket.on('actualizacionEstado', (datos) => {
             // Actualizar plato
             document.getElementById('cantidadPlato').textContent = '${datos.cantidadPlato}g';
             document.getElementById('ultimaActualizacionPlato').textContent = 
-                'Última actualización: ${formatTime(datos.timestamp)}';
+                'Última actualización: ${new Date().toLocaleTimeString()}';
             
             // Actualizar dispensador
             document.getElementById('cantidadDispensador').textContent = '${datos.cantidadDispensador}g';
             document.getElementById('ultimaActualizacionDispensador').textContent = 
-                'Última actualización: ${formatTime(datos.timestamp)}';
-        });
-
-        // Manejar errores de conexión
-        socket.on('connect_error', (error) => {
-            console.error('Error de conexión:', error);
-        });
-
-        socket.on('connect', () => {
-            console.log('Conectado al servidor');
-        });
-
-        socket.on('disconnect', () => {
-            console.log('Desconectado del servidor');
+                'Última actualización: ${new Date().toLocaleTimeString()}';
         });
     </script>
 </body>

@@ -5,15 +5,10 @@ const app = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
 
-// Variables globales para el estado
-let ultimaCantidadPlato = 0;
-let ultimaCantidadDispensador = 0;
-let ultimaActualizacion = null;
-
 // Usar la variable de entorno PORT
 const PORT = process.env.PORT || 3000;
 
-// URL de conexión de MongoDB Atlas
+// URL de conexión de MongoDB Atlas con tu usuario y contraseña
 const MONGODB_URI = "mongodb+srv://fran:tribyte@cluster0.g2lev.mongodb.net/dispensador?retryWrites=true&w=majority&appName=Cluster0";
 
 // Conexión a MongoDB Atlas
@@ -30,30 +25,12 @@ mongoose.connect(MONGODB_URI, {
     process.exit(1);
 });
 
-// Esquema para los horarios con soporte para uint16_t en gramos
+// Esquema para los horarios
 const HorarioSchema = new mongoose.Schema({
-    hora: {
-        type: Number,
-        required: true,
-        min: 0,
-        max: 23
-    },
-    minutos: {
-        type: Number,
-        required: true,
-        min: 0,
-        max: 59
-    },
-    cantidad: {
-        type: Number,
-        required: true,
-        min: 0,
-        max: 65535  // Máximo valor para uint16_t
-    },
-    createdAt: { 
-        type: Date, 
-        default: Date.now 
-    }
+    hora: Number,
+    minutos: Number,
+    cantidad: Number,
+    createdAt: { type: Date, default: Date.now }
 });
 
 const Horario = mongoose.model('Horario', HorarioSchema);
@@ -62,7 +39,6 @@ const Horario = mongoose.model('Horario', HorarioSchema);
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.json());
 
 // Rutas
 app.get('/', async (req, res) => {
@@ -87,23 +63,17 @@ app.post('/agregar-horario', async (req, res) => {
         const { horario, cantidad } = req.body;
         const [hora, minutos] = horario.split(':').map(num => parseInt(num));
         
-        // Validar que la cantidad no exceda el máximo de uint16_t
-        const cantidadNum = parseInt(cantidad);
-        if (cantidadNum < 0 || cantidadNum > 65535) {
-            throw new Error('Cantidad fuera de rango (0-65535)');
-        }
-        
         const nuevoHorario = new Horario({
             hora,
             minutos,
-            cantidad: cantidadNum
+            cantidad: parseInt(cantidad)
         });
         
         await nuevoHorario.save();
         res.redirect('/');
     } catch (error) {
         console.error('Error al guardar horario:', error);
-        res.status(500).send('Error al guardar el horario: ' + error.message);
+        res.status(500).send('Error al guardar el horario');
     }
 });
 
@@ -118,84 +88,67 @@ app.post('/eliminar-horario/:id', async (req, res) => {
 });
 
 app.get('/api/datos', async (req, res) => {
-    try {
-        const horarios = await Horario.find().sort({ hora: 1, minutos: 1 });
-        
-        if (horarios.length > 0) {
-            const datosFormateados = horarios.map(horario => ({
-                hora: horario.hora,
-                minuto: horario.minutos,
-                gramos: horario.cantidad  // Ya soporta uint16_t
-            }));
-            res.json(datosFormateados);
-        } else {
-            res.json({
-                mensaje: "No hay horarios programados"
-            });
-        }
-    } catch (error) {
-        console.error('Error al obtener horarios:', error);
-        res.status(500).json({ error: 'Error al obtener datos' });
+  try {
+    const horarios = await Horario.find().sort({ hora: 1, minutos: 1 });
+    
+    if (horarios.length > 0) {
+      const datosFormateados = horarios.map(horario => ({
+        hora: horario.hora,
+        minuto: horario.minutos,
+        gramos: horario.cantidad
+      }));
+      res.json(datosFormateados);
+    } else {
+      res.json({
+        mensaje: "No hay horarios programados"
+      });
     }
+  } catch (error) {
+    console.error('Error al obtener horarios:', error);
+    res.status(500).json({ error: 'Error al obtener datos' });
+  }
 });
 
 app.get('/estado-plato', (req, res) => {
-    res.render('estado-plato', {
-        cantidadPlato: ultimaCantidadPlato,
-        cantidadDispensador: ultimaCantidadDispensador,
-        ultimaActualizacion: ultimaActualizacion
-    });
-});
-
-// Endpoint para recibir datos del ESP32
-app.post('/api/actualizar-estado', (req, res) => {
     try {
-        const { cantidadPlato, cantidadDispensador } = req.body;
-        
-        // Validar y convertir a números
-        ultimaCantidadPlato = parseInt(cantidadPlato);
-        ultimaCantidadDispensador = parseInt(cantidadDispensador);
-        ultimaActualizacion = new Date();
-        
-        // Validar rangos
-        if (ultimaCantidadPlato < 0 || ultimaCantidadPlato > 65535 ||
-            ultimaCantidadDispensador < 0 || ultimaCantidadDispensador > 65535) {
-            throw new Error('Valores fuera de rango (0-65535)');
-        }
-        
-        // Emitir los datos a todos los clientes conectados
-        io.emit('actualizacionEstado', {
-            cantidadPlato: ultimaCantidadPlato,
-            cantidadDispensador: ultimaCantidadDispensador,
-            timestamp: ultimaActualizacion.toISOString()
-        });
-        
-        res.json({ 
-            success: true,
-            message: 'Estado actualizado correctamente',
-            datos: {
-                cantidadPlato: ultimaCantidadPlato,
-                cantidadDispensador: ultimaCantidadDispensador,
-                timestamp: ultimaActualizacion
-            }
+        res.render('estado-plato', {
+            error: null,
+            cantidad: null,
+            ultimaActualizacion: null
         });
     } catch (error) {
-        console.error('Error al actualizar estado:', error);
-        res.status(400).json({ 
-            success: false, 
-            error: error.message 
+        console.error('Error al cargar estado del plato:', error);
+        res.status(500).render('error', {
+            mensaje: 'Error al cargar la página',
+            error: 'Por favor, intenta nuevamente más tarde'
         });
     }
 });
 
-// Endpoint para obtener el último estado
-app.get('/api/estado', (req, res) => {
-    res.json({
-        success: true,
-        cantidadPlato: ultimaCantidadPlato,
-        cantidadDispensador: ultimaCantidadDispensador,
-        ultimaActualizacion: ultimaActualizacion
+// Endpoint para recibir datos del ESP32
+app.post('/api/actualizar-estado', express.json(), (req, res) => {
+    const { cantidadPlato, cantidadDispensador } = req.body;
+    
+    // Emitir los datos a todos los clientes conectados
+    io.emit('actualizacionEstado', {
+        cantidadPlato,
+        cantidadDispensador
     });
+    
+    res.json({ success: true });
+});
+
+// Endpoint para obtener el último estado
+app.get('/api/estado', async (req, res) => {
+    try {
+        // Aquí podrías obtener los últimos valores de una base de datos
+        res.json({
+            cantidadPlato: ultimaCantidadPlato,
+            cantidadDispensador: ultimaCantidadDispensador
+        });
+    } catch (error) {
+        res.status(500).json({ error: 'Error al obtener datos' });
+    }
 });
 
 http.listen(PORT, () => {
