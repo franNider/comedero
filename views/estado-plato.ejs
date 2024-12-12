@@ -49,15 +49,15 @@
         
         socket.on('actualizacionEstado', (datos) => {
             // Actualizar plato
-            document.getElementById('cantidadPlato').textContent = '${datos.cantidadPlato}g';
+            document.getElementById('cantidadPlato').textContent = `${datos.cantidadPlato}g`;
             document.getElementById('ultimaActualizacionPlato').textContent = 
-                'Última actualización: ${new Date().toLocaleTimeString()}';
+                `Última actualización: ${new Date().toLocaleTimeString()}`;
             
             // Actualizar dispensador
-            document.getElementById('cantidadDispensador').textContent = '${datos.cantidadDispensador}g';
+            document.getElementById('cantidadDispensador').textContent = `${datos.cantidadDispensador}g`;
             document.getElementById('ultimaActualizacionDispensador').textContent = 
-                'Última actualización: ${new Date().toLocaleTimeString()}';
+                `Última actualización: ${new Date().toLocaleTimeString()}`;
         });
     </script>
 </body>
-</html>
+</html> 
